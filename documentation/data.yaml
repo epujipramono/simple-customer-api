@@ -1,0 +1,293 @@
+openapi: 3.2.1
+info:
+  title: Customer API
+  description: Dokumentasi sederhana API customer Web API yang memiliki fitur CRUD(Create, Read/Retrieve, Update, dan Delete) data customer yang tersimpan di database.
+  version: 1.0.0
+servers:
+  - url: "http://localhost:8080"
+    description: localhost
+  - url: "https://app.ac.id"
+    description: production
+paths:
+  /api/v1/customers:
+    get:
+      summary: Get all customers
+      description: Mengambil data semua customer
+      responses:
+        "200":
+          description: Berhasil mengambil data semua customer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Customer"
+        "500":
+          description: Kesalahan pada server
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Add customer
+      description: Menambahkan customer baru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - phone
+              properties:
+                name:
+                  type: string
+                  examples:
+                    - Budi
+                email:
+                  type: string
+                  format: email
+                  examples:
+                    - budi@example.com
+                phone:
+                  type: string
+                  examples:
+                    - "08123456789"
+      responses:
+        "201":
+          description: Customer berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessAddCustomer"
+        "400":
+          description: Request body tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                InvalidRequest:
+                  summary: Invalid request
+                  value:
+                    error: Invalid request.
+                DuplicateEmail:
+                  summary: Email sudah terdaftar
+                  value:
+                    error: Email already exists.
+                IncorrectEmail:
+                  summary: Format email tidak valid
+                  value:
+                    error: Incorrect email format.
+                IncorrectPhone:
+                  summary: Format nomor telepon tidak valid
+                  value:
+                    error: Incorrect phone format.
+                EmptyField:
+                  summary: Mandatory field belum diisi
+                  value:
+                    error: Name, email, and phone are required.
+        "500":
+          description: Kesalahan pada server
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/customers/id:
+    get:
+      summary: Get customer by id
+      description: Mengambil data customer berdasarkan id
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Cari berdasarkan id
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Berhasil mengambil data customer berdasarkan id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "404":
+          description: Data customer tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorIDNotFound"
+        "500":
+          description: Kesalahan pada server
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Update customer by id
+      description: Update data customer berdasarkan id
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Cari berdasarkan id
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - phone
+              properties:
+                name:
+                  type: string
+                  examples:
+                    - Budi
+                email:
+                  type: string
+                  format: email
+                  examples:
+                    - budi@example.com
+                phone:
+                  type: string
+                  examples:
+                    - "08123456789"
+      responses:
+        "200":
+          description: Customer berhasil diupdate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessUpdateCustomer"
+        "400":
+          description: Request body tidak valid atau terdapat kesalahan validasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                InvalidRequest:
+                  summary: Invalid request
+                  value:
+                    error: Invalid request.
+                DuplicateEmail:
+                  summary: Email sudah terdaftar
+                  value:
+                    error: Email already exists.
+                IncorrectEmail:
+                  summary: Format email tidak valid
+                  value:
+                    error: Incorrect email format.
+                IncorrectPhone:
+                  summary: Format nomor telepon tidak valid
+                  value:
+                    error: Incorrect phone format.
+                EmptyField:
+                  summary: Mandatory field belum diisi
+                  value:
+                    error: Name, email, and phone are required.
+        "404":
+          description: Data customer tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorIDNotFound"
+        "500":
+          description: Kesalahan pada server
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete customer by id
+      description: Delete data customer berdasarkan id
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Cari berdasarkan id
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Customer berhasil dihapus
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessDeleteCustomer"
+        "404":
+          description: Data customer tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorIDNotFound"
+        "500":
+          description: Kesalahan pada server
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+          examples:
+            - 1
+        name:
+          type: string
+          examples:
+            - Budi Setiawan
+        email:
+          type: string
+          format: email
+          examples:
+            - budi.setiawan@example.com
+        phone:
+          type: string
+          examples:
+            - "08123456789"
+    SuccessAddCustomer:
+      type: object
+      properties:
+        error:
+          type: string
+          examples:
+            - Customer added successfully.
+    SuccessUpdateCustomer:
+      type: object
+      properties:
+        error:
+          type: string
+          examples:
+            - Customer updated successfully.
+    SuccessDeleteCustomer:
+      type: object
+      properties:
+        error:
+          type: string
+          examples:
+            - Customer deleted successfully.
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          examples:
+            - Invalid request
+    ErrorIDNotFound:
+      type: object
+      properties:
+        error:
+          type: string
+          examples:
+            - Customer data not found.
